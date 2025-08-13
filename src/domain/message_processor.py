@@ -1,15 +1,20 @@
-# Procesador de mensajes de WhatsApp
+"""
+Path: src/domain/message_processor.py
+"""
+
 import hashlib
 from datetime import datetime
 from src.domain.message_parser import MessageParser
 
 class MessageProcessor:
+    "Procesador de mensajes de WhatsApp"
     def __init__(self, config):
         self.config = config
         self.parser = MessageParser()
         self.seen_messages = set()
 
     def process(self, message: dict) -> dict | None:
+        "Procesa un mensaje de WhatsApp."
         key = hashlib.sha1((message["meta"] + "\n" + message["body"]).encode("utf-8")).hexdigest()
         if key in self.seen_messages:
             return None
