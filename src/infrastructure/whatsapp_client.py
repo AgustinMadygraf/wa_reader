@@ -19,8 +19,8 @@ class WhatsAppClient:
     def __enter__(self):
         self.playwright = sync_playwright().start()
         self.context = self.playwright.chromium.launch_persistent_context(
-            user_data_dir=self.config.USER_DATA,
-            headless=self.config.HEADLESS
+            user_data_dir=self.config.user_data,
+            headless=self.config.headless
         )
         self.page = self.context.new_page()
         return self
