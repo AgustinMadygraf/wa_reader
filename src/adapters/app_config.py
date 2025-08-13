@@ -2,11 +2,14 @@
 Path: src/Adapters/AppConfig.py
 """
 
+from dateutil import tz
+
 class AppConfig:
+    "Configuración de la aplicación"
     def __init__(self):
-        self.CHAT_NAME = "Producción Mady"
-        self.INGEST_URL = "http://127.0.0.1/ingesta"
-        self.HEADLESS = False
-        self.USER_DATA = "./wa_profile"
-        self.POLL_SEC = 5
-        self.TZ_LOCAL = tz.gettz("America/Argentina/Buenos_Aires")
+        self.chat_name = "Producción Mady"
+        self.ingest_url = "http://127.0.0.1/ingesta"
+        self.headless = False
+        self.user_data = "./wa_profile"
+        self.poll_sec = 5
+        self.tz_local = tz.gettz("America/Argentina/Buenos_Aires")

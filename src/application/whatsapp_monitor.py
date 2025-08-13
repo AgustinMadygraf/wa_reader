@@ -2,7 +2,9 @@
 Path: src/Application/WhatsAppMonitor.py
 """
 import hashlib
-import datetime
+from datetime import datetime
+import time
+from urllib.parse import urlencode
 from src.adapters.app_config import AppConfig
 from src.domain.message_parser import MessageParser
 from src.infrastructure.ingest_service import IngestService
@@ -42,7 +44,7 @@ class WhatsAppMonitor:
         with WhatsAppClient(self.config) as wa_client:
             wa_client.initialize()
             wa_client.open_chat(self.config.CHAT_NAME)
-            
+
             while True:
                 messages = wa_client.get_messages()
                 for msg in messages:
