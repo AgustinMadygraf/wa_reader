@@ -13,7 +13,8 @@ if __name__ == "__main__":
     parser.add_argument("--monitor", action="store_true", help="Inicia el monitor en tiempo real")
     parser.add_argument("--historial", action="store_true", help="Revisa el historial de mensajes")
     parser.add_argument("--debug", action="store_true", help="Habilita logging DEBUG")
-    parser.add_argument("--output-mode", choices=["cli", "api"], default="cli", help="Modo de salida")
+    parser.add_argument("--output-mode", choices=["cli", "api"],
+                        default="cli", help="Modo de salida")
     args = parser.parse_args()
 
     setup_logging(debug=args.debug)

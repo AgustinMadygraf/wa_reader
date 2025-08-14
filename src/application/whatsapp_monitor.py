@@ -2,7 +2,9 @@
 Path: src/Application/WhatsAppMonitor.py
 """
 import time
+import logging
 from urllib.parse import urlencode
+import requests
 from src.adapters.app_config import AppConfig
 from src.domain.message_processor import MessageProcessor
 from src.infrastructure.ingest_service import IngestService
@@ -14,18 +16,38 @@ class WhatsAppMonitor:
         self.config = config
         self.ingest_service = IngestService(config.ingest_url)
         self.processor = MessageProcessor(config)
+        self.logger = logging.getLogger("wa_reader.monitor")
 
     def run(self):
         "Ejecuta el monitor de WhatsApp."
-        with WhatsAppClient(self.config) as wa_client:
-            wa_client.initialize()
-            wa_client.open_chat(self.config.chat_name)
+        self.logger.info("Iniciando monitor de WhatsApp...")
+        try:
+            with WhatsAppClient(self.config) as wa_client:
+                self.logger.info("Inicializando cliente de WhatsApp...")
+                wa_client.initialize()
+                self.logger.info("Abriendo chat: %s", self.config.chat_name)
+                wa_client.open_chat(self.config.chat_name)
 
-            while True:
-                messages = wa_client.get_messages()
-                for msg in messages:
-                    if payload := self.processor.process(msg):
-                        status = self.ingest_service.send(payload)
-                        estado = status if status is not None else "ERROR_RED"
-                        print(f"→ GET {self.config.ingest_url}?{urlencode(payload)}  [{estado}]")
-                time.sleep(self.config.poll_sec)
+                while True:
+                    self.logger.debug("Obteniendo mensajes...")
+                    messages = wa_client.get_messages()
+                    self.logger.debug("Total mensajes obtenidos: %d", len(messages))
+                    for msg in messages:
+                        try:
+                            payload = self.processor.process(msg)
+                        except (ValueError, TypeError) as e:
+                            self.logger.error("Error procesando mensaje: %s", e)
+                            continue
+                        if payload:
+                            try:
+                                status = self.ingest_service.send(payload)
+                                estado = status if status is not None else "ERROR_RED"
+                                url = f"{self.config.ingest_url}?{urlencode(payload)}"
+                                self.logger.info("→ GET %s  [%s]", url, estado)
+                            except requests.RequestException as e:
+                                self.logger.error("Error enviando payload: %s", e)
+                    time.sleep(self.config.poll_sec)
+        except KeyboardInterrupt:
+            self.logger.info("Monitor detenido por el usuario.")
+        except (RuntimeError, ConnectionError) as e:
+            self.logger.error("Error crítico en monitor: %s", e)

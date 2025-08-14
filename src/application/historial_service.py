@@ -67,7 +67,8 @@ class HistorialService:
                                 ),
                                 payload.get("turno") or "s/d",
                                 payload.get("personas") or "s/d",
-                                payload.get("obs") if payload.get("obs") else "sin clasificar"
+                                payload.get("obs") if payload.get("obs") else "sin clasificar",
+                                "TodoPlastic"  # Columna cliente
                             ])
                         else:
                             try:
