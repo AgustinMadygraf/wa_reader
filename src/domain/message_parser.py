@@ -49,13 +49,10 @@ class MessageParser:
     def norm_int(num_str: str) -> int:
         "Normaliza una cadena a un entero."
         num_str = num_str.replace(".", "").replace(",", "")
-        palabras = {
-            "uno": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5,
-            "seis": 6, "siete": 7, "ocho": 8, "nueve": 9, "diez": 10
-        }
         try:
             return int(num_str)
         except ValueError:
+            palabras = {"uno": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5}
             return palabras.get(num_str.lower(), 0)
 
     def parse(self, text: str) -> dict:

@@ -14,3 +14,4 @@ class AppConfig:
         self.poll_sec = 5
         self.tz_local = tz.gettz("America/Argentina/Buenos_Aires")
         self.chat_archived = False
+        self.output_mode = "cli"
