@@ -36,49 +36,108 @@ class WhatsAppClient:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.logger.info("Cerrando contexto y Playwright...")
-        if self.context:
-            self.context.close()
-            self.logger.debug("Contexto cerrado.")
-        if self.playwright:
-            self.playwright.stop()
-            self.logger.debug("Playwright detenido.")
-
-    def initialize(self):
-        "Inicializa el cliente de WhatsApp."
-        self.logger.info("Navegando a WhatsApp Web...")
-        self.page.goto("https://web.whatsapp.com")
-        self.logger.debug("Esperando login de usuario...")
+        # Evitar cerrar el contexto si Playwright ya fue detenido
         try:
-            self._wait_for_login()
-        except KeyboardInterrupt:
-            self.logger.warning("Interrupción por el usuario durante el login. Cerrando recursos...")
             if self.context:
                 self.context.close()
-                self.logger.debug("Contexto cerrado por interrupción.")
+                self.logger.debug("Contexto cerrado.")
+        except Error as e:
+            self.logger.warning("No se pudo cerrar el contexto: %s", e)
+        try:
             if self.playwright:
                 self.playwright.stop()
-                self.logger.debug("Playwright detenido por interrupción.")
-            raise
+                self.logger.debug("Playwright detenido.")
+        except Error as e:
+            self.logger.warning("No se pudo detener Playwright: %s", e)
 
-    def _wait_for_login(self):
-        "Espera a que el usuario inicie sesión."
-        selector = "div[title='Buscar o empezar un chat'], div[title='Search or start new chat']"
-        self.logger.debug("Esperando selector de login: %s", selector)
+    def initialize(self, login_timeout: int = 120, retry_count: int = 2):
+        "Inicializa el cliente de WhatsApp. login_timeout en segundos."
+        self.logger.info("Navegando a WhatsApp Web...")
+
+        for attempt in range(1, retry_count + 1):
+            try:
+                self.page.goto("https://web.whatsapp.com")
+                self.logger.debug("Esperando login de usuario (intento %d de %d)...",
+                                 attempt, retry_count)
+                self._wait_for_login(timeout=login_timeout)
+                self.logger.info("Login exitoso en WhatsApp Web.")
+                return
+            except KeyboardInterrupt:
+                self.logger.warning("Interrupción por el usuario durante el login.")
+                self._cleanup("interrupción")
+                raise
+            except RuntimeError as e:
+                if attempt < retry_count:
+                    self.logger.warning(
+                        "Intento %d fallido. Reintentando en 5 segundos...", attempt
+                    )
+                    self.page.wait_for_timeout(5000)  # Esperar 5 segundos
+                    self.page.reload()  # Recargar la página
+                else:
+                    self.logger.error(
+                        "Timeout de login superado después de %d intentos: %s", 
+                        retry_count, e
+                    )
+                    self._cleanup("timeout")
+                    raise
+
+    def _cleanup(self, reason: str):
+        "Limpia los recursos del cliente."
+        if self.context:
+            self.context.close()
+            self.logger.debug("Contexto cerrado por %s.", reason)
+        if self.playwright:
+            self.playwright.stop()
+            self.logger.debug("Playwright detenido por %s.", reason)
+
+    def _wait_for_login(self, timeout: int = 120):
+        "Espera a que el usuario inicie sesión. timeout en segundos."
+        # Múltiples selectores para mayor compatibilidad con cambios en la interfaz
+        selectors = [
+            "div[title='Buscar o empezar un chat'], div[title='Search or start new chat']",
+            "[data-testid='chat-list-search']",  # Selector alternativo para el buscador
+            "[data-icon='search']",  # Icono de búsqueda
+            ".two, .three",  # Selectores para los paneles de WhatsApp Web
+            "._1Flk2, ._13NKt"  # Clases comunes del campo de búsqueda
+        ]
+        self.logger.info("Por favor espere mientras se carga la interfaz de WhatsApp Web...")
+        for selector in selectors:
+            try:
+                self.logger.debug("Intentando selector: %s", selector)
+                self.page.wait_for_selector(selector, timeout=10000)  # 10 segundos por selector
+                self.logger.info("Login exitoso en WhatsApp Web (selector: %s).", selector)
+                return
+            except Error:
+                self.logger.debug("Selector no encontrado: %s", selector)
+                continue
+        self.logger.error(
+            "No se pudo detectar la interfaz de WhatsApp Web después de %d segundos.",
+            timeout
+        )
         try:
-            # wait_for_selector espera a que el elemento esté presente en el DOM y sea visible.
-            # Es útil para sincronizar la automatización con el estado de la página.
-            self.page.wait_for_selector(
-                selector,
-                timeout=120000
-            )
-            self.logger.info("Login exitoso en WhatsApp Web.")
-        except Error as exc:
-            self.logger.error("No se cargó WhatsApp Web a tiempo. ¿Escaneaste el QR?")
-            self.logger.debug("Error en wait_for_selector: %s", exc)
-            raise RuntimeError("No se cargó WhatsApp Web a tiempo. ¿Escaneaste el QR?") from exc
+            screenshot_path = "wa_login_error.png"
+            self.page.screenshot(path=screenshot_path)
+            self.logger.error("Screenshot guardada en: %s", screenshot_path)
+        except Error as e:
+            self.logger.error("No se pudo guardar screenshot: %s", e)
+
+        # Verificar si hay QR o ya está en la interfaz
+        try:
+            if self.page.locator("canvas[aria-label='Scan me!']").count() > 0:
+                self.logger.error(
+                    "Se detectó un código QR. Por favor escanee el código con su teléfono.")
+            elif self.page.locator("[data-testid='chat-list']").count() > 0:
+                self.logger.warning(
+                    "Se detectó la lista de chats pero no el buscador. Intentando continuar...")
+                return
+        except Error:
+            pass
+
+        self.logger.error("¿WhatsApp Web está cargado correctamente? Verifique la pantalla.")
+        raise RuntimeError("No se pudo detectar la interfaz de WhatsApp Web")
 
     def open_chat(self, chat_name: str):
-        "Abre un chat en WhatsApp."
+        "Abre un chat en WhatsApp, buscando en la lista principal y en archivados si es necesario."
         self.logger.info("Buscando y abriendo chat: %s", chat_name)
         try:
             self.page.get_by_role("textbox", name=re.compile("Buscar|Search", re.I)).click()
@@ -87,8 +146,32 @@ class WhatsAppClient:
                 "No se pudo hacer click en el textbox de búsqueda, "
                 "intentando continuar..."
             )
-        self.page.locator(f"//span[@title='{chat_name}']").first.click()
-        self.logger.info("Leyendo chat: %s", chat_name)
+        chat_locator = self.page.locator(f"//span[@title='{chat_name}']")
+        if chat_locator.count() > 0:
+            chat_locator.first.click()
+            self.logger.info("Leyendo chat: %s", chat_name)
+            return
+        # Si no se encuentra, buscar en archivados solo si chat_archived=True
+        self.logger.info("Chat '%s' no encontrado en la lista principal.", chat_name)
+        if getattr(self.config, "chat_archived", False):
+            self.logger.info("Buscando en archivados...")
+            archived_locator = self.page.locator(
+                "//span[contains(text(), 'Archivados') or contains(text(), 'Archived')]")
+            if archived_locator.count() > 0:
+                archived_locator.first.click()
+                self.logger.info("Sección de archivados abierta.")
+                self.page.wait_for_timeout(1000)
+                archived_chat_locator = self.page.locator(f"//span[@title='{chat_name}']")
+                if archived_chat_locator.count() > 0:
+                    archived_chat_locator.first.click()
+                    self.logger.info("Leyendo chat archivado: %s", chat_name)
+                    return
+                else:
+                    self.logger.error("El chat '%s' no se encuentra en archivados.", chat_name)
+            else:
+                self.logger.error("No se encontró la sección de archivados en WhatsApp Web.")
+        else:
+            self.logger.info("No se buscará en archivados porque chat_archived=False.")
 
     def get_messages(self) -> list[dict]:
         "Obtiene los mensajes del chat."
