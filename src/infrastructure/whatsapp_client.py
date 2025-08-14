@@ -181,7 +181,7 @@ class WhatsAppClient:
         count = bubbles.count()
         self.logger.debug("Cantidad de burbujas encontradas: %d", count)
 
-        for i in range(max(0, count - 40), count):
+        for i in range(count):
             try:
                 element = bubbles.nth(i)
                 meta = element.get_attribute("data-pre-plain-text") or ""
