@@ -36,19 +36,16 @@ class WhatsAppClient:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.logger.info("Cerrando contexto y Playwright...")
-        # Evitar cerrar el contexto si Playwright ya fue detenido
         try:
             if self.context:
                 self.context.close()
-                self.logger.debug("Contexto cerrado.")
-        except Error as e:
-            self.logger.warning("No se pudo cerrar el contexto: %s", e)
+        except Exception as e:
+            self.logger.warning("Error cerrando contexto: %s", e)
         try:
             if self.playwright:
                 self.playwright.stop()
-                self.logger.debug("Playwright detenido.")
-        except Error as e:
-            self.logger.warning("No se pudo detener Playwright: %s", e)
+        except Exception as e:
+            self.logger.warning("Error cerrando Playwright: %s", e)
 
     def initialize(self, login_timeout: int = 120, retry_count: int = 2):
         "Inicializa el cliente de WhatsApp. login_timeout en segundos."

@@ -9,6 +9,7 @@ def setup_logging(debug: bool = False):
     level = logging.DEBUG if debug else logging.INFO
     logging.basicConfig(
         level=level,
-        format="%(levelname)s %(filename)s:%(lineno)d [%(name)s] %(asctime)s: %(message)s",
+        #format="%(levelname)s %(filename)s:%(lineno)d [%(name)s] %(asctime)s: %(message)s",
+        format="%(levelname)s %(filename)s:%(lineno)d %(message)s",
         datefmt="%H:%M:%S"
     )

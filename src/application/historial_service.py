@@ -21,16 +21,15 @@ class HistorialService:
     def revisar(self):
         "Revisa el historial de mensajes de WhatsApp y muestra por CLI o envía por API"
         logger = logging.getLogger("wa_reader.historial")
-        local_config = AppConfig()
-        ingest_service = IngestService(local_config.ingest_url)
-        processor = MessageProcessor(local_config)
+        ingest_service = IngestService(self.config.ingest_url)
+        processor = MessageProcessor(self.config)
         presenter = HistorialPresenter()
         try:
-            with WhatsAppClient(local_config) as wa_client:
+            with WhatsAppClient(self.config) as wa_client:
                 logger.info("Inicializando cliente de WhatsApp...")
                 wa_client.initialize()
-                logger.info("Abriendo chat: %s", local_config.chat_name)
-                wa_client.open_chat(local_config.chat_name)
+                logger.info("Abriendo chat: %s", self.config.chat_name)
+                wa_client.open_chat(self.config.chat_name)
                 logger.info("Extrayendo historial de mensajes...")
                 messages = wa_client.get_messages()
                 logger.debug("Total mensajes obtenidos: %d", len(messages))
@@ -38,10 +37,8 @@ class HistorialService:
                 tabla = []
                 tabla_prev = []
                 for msg in reversed(messages):
-                    # Extraer fecha y autor del campo meta
                     meta = msg.get("meta", "")
                     body = msg.get("body", "")
-                    # Ejemplo de meta: [9:49 p. m., 13/8/2025] Cele Mady 2:
                     m = re.match(r"\[(.+?),\s*(.+?)\]\s*(.+?):", meta)
                     if m:
                         fecha = m.group(2)
@@ -57,7 +54,8 @@ class HistorialService:
                         logger.error("Error procesando mensaje: %s", e)
                         continue
                     if payload:
-                        if local_config.output_mode == "cli":
+                        if self.config.output_mode == "cli":
+                            logger.debug("Mostrando resultados en CLI...")
                             tabla.append([
                                 payload.get("fecha") or "s/d",
                                 payload.get("maquina") or "s/d",
@@ -83,11 +81,10 @@ class HistorialService:
                             except (ConnectionError, TimeoutError, ValueError) as e:
                                 logger.error("Error enviando payload: %s", e)
                         procesados += 1
-                if local_config.output_mode == "cli":
-                    # Mostrar tabla previa
-                    presenter.mostrar_tabla_cruda(tabla_prev, local_config.chat_name)
-                    # Mostrar tabla procesada
-                    presenter.mostrar_tabla_procesada(tabla, local_config.chat_name)
+                if self.config.output_mode == "cli":
+                    logger.info("Mostrando resultados en CLI...")
+                    presenter.mostrar_tabla_cruda(tabla_prev, self.config.chat_name)
+                    presenter.mostrar_tabla_procesada(tabla, self.config.chat_name)
                 logger.info(
                     "Historial procesado: %d de %d mensajes revisados.",
                     procesados,
