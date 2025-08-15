@@ -11,12 +11,16 @@ from src.infrastructure.ingest_service import IngestService
 from src.infrastructure.whatsapp_client import WhatsAppClient
 from src.domain.meta_parser import MetaParser
 
+
 class WhatsAppMonitor:
     "Monitor de WhatsApp"
-    def __init__(self, config: AppConfig):
+    def __init__(self, config: AppConfig, processor=None):
         self.config = config
         self.ingest_service = IngestService(config.ingest_url)
-        self.processor = MessageProcessor(config)
+        if processor is None:
+            self.processor = MessageProcessor(config)
+        else:
+            self.processor = processor
         self.logger = logging.getLogger("wa_reader.monitor")
 
     def run(self):

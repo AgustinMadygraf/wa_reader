@@ -6,12 +6,12 @@ import re
 class MetaParser:
     "Parser para extraer información del campo meta de mensajes de WhatsApp"
     AUTHOR_ROLES = {
-        "Mariano Montenegro Madygraf": "Supervisor",
+        "Mariano Montenegro Madygraf": "Operario",
         "Maria De Los Angeles Madygraf": "Operaria",
         "🌸Eri 2": "Operaria",
         "Cele Mady 2": "Operaria",
         "PolloArriondo RRD": "Operario",
-        "Nico Malo Mady": "Operario",
+        "Nico Malo Mady": "Coordinador",
         "Loco Medina Mady": "Operario",
         "Emiliana Madygraf": "Operaria",
     }

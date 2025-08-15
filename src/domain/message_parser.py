@@ -5,11 +5,12 @@ Path: src/domain/message_parser.py
 import re
 import logging
 from src.common.logging_config import setup_logging
+from src.domain.interfaces import IMessageParser
 
 setup_logging(debug=True)
 logger = logging.getLogger("wa_reader.message_parser")
 
-class MessageParser:
+class MessageParser(IMessageParser):
     "Parser de mensajes de WhatsApp"
     def __init__(self):
         # Formato: 22x10x30, 30x12x32, etc.
@@ -44,6 +45,11 @@ class MessageParser:
         )
         # Turno: turno tarde, turno mañana, etc.
         self.p_turno = re.compile(r"turno\s+(mañana|tarde|noche)", re.I)
+        # Almacena el texto original del mensaje para observaciones
+        self._texto_original = ""
+        # Patrones para tareas pendientes y finalizadas
+        self.p_tarea_pendiente = re.compile(r"\b(hay que|pendiente|falta|para mañana|por hacer|debe|debería|recordar|no olvidar)\b", re.I)
+        self.p_tarea_finalizada = re.compile(r"\b(terminado|finalizado|listo|completado|hecho|resuelto|cerrado|solucionado|ok|realizado)\b", re.I)
 
     @staticmethod
     def norm_int(num_str: str) -> int:
@@ -58,6 +64,7 @@ class MessageParser:
     def parse(self, text: str) -> dict:
         "Parses a WhatsApp message and extracts relevant information."
         t = " ".join(text.split())
+        self._texto_original = text  # Guarda el texto original para observaciones
         out = {}
         if m := self.p_maq.search(t):
             out["maquina"] = m.group(1).lower()
@@ -86,5 +93,21 @@ class MessageParser:
         return out if any(out) else {}
 
     def _detectar_observaciones(self) -> list:
-        # Implementa tu lógica de observaciones aquí si es necesario
-        return []
+        "Detecta observaciones usando el texto original del mensaje."
+        texto = getattr(self, "_texto_original", "")
+        t = " ".join(texto.split())
+        observaciones = []
+        # Detectar tarea finalizada
+        if self.p_tarea_finalizada.search(t):
+            observaciones.append("Tarea Finalizada")
+        # Detectar tarea pendiente
+        elif self.p_tarea_pendiente.search(t):
+            observaciones.append("Tarea Pendiente")
+        # Si no se detecta ninguna categoría relevante, asigna 'Sin clasificar'
+        tiene_maquina = bool(self.p_maq.search(t))
+        tiene_formato = bool(self.p_formato.search(t))
+        tiene_cantidad = bool(self.p_cant_ctx.search(t))
+        if not (tiene_maquina or tiene_formato or tiene_cantidad):
+            if not observaciones:
+                observaciones.append("Sin clasificar")
+        return observaciones

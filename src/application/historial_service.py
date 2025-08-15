@@ -10,13 +10,17 @@ from src.infrastructure.ingest_service import IngestService
 from src.application.historial_presenter import HistorialPresenter
 from src.domain.meta_parser import MetaParser
 
+
 class HistorialService:
     "Servicio para gestionar el historial de mensajes de WhatsApp"
-    def __init__(self, config: AppConfig):
+    def __init__(self, config: AppConfig, processor=None):
         self.config = config
         self.logger = logging.getLogger("wa_reader.historial")
         self.ingest_service = IngestService(config.ingest_url)
-        self.processor = MessageProcessor(config)
+        if processor is None:
+            self.processor = MessageProcessor(config)
+        else:
+            self.processor = processor
 
     def revisar(self):
         "Revisa el historial de mensajes de WhatsApp y muestra por CLI o envía por API"

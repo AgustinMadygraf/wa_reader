@@ -4,9 +4,13 @@ Path: run.py
 
 import argparse
 from src.common.logging_config import setup_logging
+
 from src.application.whatsapp_monitor import WhatsAppMonitor
 from src.application.historial_service import HistorialService
 from src.adapters.app_config import AppConfig
+from src.domain.message_parser import MessageParser
+from src.domain.strategies import ObservacionTareaStrategy
+from src.domain.message_processor import MessageProcessor
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor y revisión de historial de WhatsApp")
@@ -21,11 +25,24 @@ if __name__ == "__main__":
 
     config = AppConfig()
     config.output_mode = args.output_mode
+
+    # Instanciar la estrategia personalizada para análisis de mensajes
+    base_parser = MessageParser()
+    estrategia = ObservacionTareaStrategy(base_parser)
+
     try:
         if args.historial:
-            HistorialService(config).revisar()
+            HistorialService(
+                config,
+                processor=MessageProcessor(
+                    config,
+                    parser_strategy=estrategia
+                )
+            ).revisar()
         else:
-            monitor = WhatsAppMonitor(config)
+            monitor = WhatsAppMonitor(config,
+                                      processor=MessageProcessor(config,
+                                                                         parser_strategy=estrategia))
             monitor.run()
     except KeyboardInterrupt:
         print("\nAplicación detenida por el usuario")

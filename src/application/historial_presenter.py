@@ -3,11 +3,12 @@ Path: src/application/historial_presenter.py
 """
 
 from tabulate import tabulate
+from src.domain.meta_parser import MetaParser
 
 class HistorialPresenter:
+    "Presenta el historial de mensajes en CLI"
     def mostrar_tabla_autor_cargo(self, tabla_prev, chat_name):
-        """Muestra la tabla con columnas: Fecha, Autor, Mensaje (truncado), Cargo"""
-        from src.domain.meta_parser import MetaParser
+        "Muestra la tabla con columnas: Fecha, Autor, Mensaje (truncado), Cargo"
         filas = []
         for fecha, autor, mensaje in tabla_prev:
             cargo = MetaParser.get_cargo(autor)
@@ -20,10 +21,10 @@ class HistorialPresenter:
             tablefmt="github",
             showindex=False
         ))
-    "Presenta el historial de mensajes en CLI"
+
     @staticmethod
     def truncar_mensaje(mensaje: str, max_len: int = 40) -> str:
-        """Trunca el mensaje a max_len caracteres, agregando '...' si es necesario."""
+        "Trunca el mensaje a max_len caracteres, agregando '...' si es necesario."
         if len(mensaje) > max_len:
             return mensaje[:max_len-3] + '...'
         return mensaje
