@@ -6,6 +6,12 @@ from tabulate import tabulate
 
 class HistorialPresenter:
     "Presenta el historial de mensajes en CLI"
+    @staticmethod
+    def truncar_mensaje(mensaje: str, max_len: int = 40) -> str:
+        """Trunca el mensaje a max_len caracteres, agregando '...' si es necesario."""
+        if len(mensaje) > max_len:
+            return mensaje[:max_len-3] + '...'
+        return mensaje
     def mostrar_tabla_cruda(self, tabla_prev, _chat_name):
         "Muestra la tabla cruda de mensajes"
         print("\nMensajes crudos del chat:\n")

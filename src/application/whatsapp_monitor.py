@@ -9,6 +9,7 @@ from src.adapters.app_config import AppConfig
 from src.domain.message_processor import MessageProcessor
 from src.infrastructure.ingest_service import IngestService
 from src.infrastructure.whatsapp_client import WhatsAppClient
+from src.domain.meta_parser import MetaParser
 
 class WhatsAppMonitor:
     "Monitor de WhatsApp"
@@ -33,6 +34,11 @@ class WhatsAppMonitor:
                     messages = wa_client.get_messages()
                     self.logger.debug("Total mensajes obtenidos: %d", len(messages))
                     for msg in messages:
+                        meta = msg.get("meta", "")
+                        _body = msg.get("body", "")
+                        meta_info = MetaParser.parse(meta)
+                        _fecha = meta_info["fecha"]
+                        _autor = meta_info["autor"]
                         try:
                             payload = self.processor.process(msg)
                         except (ValueError, TypeError) as e:

@@ -3,12 +3,12 @@ Path: src/application/historial_service.py
 """
 
 import logging
-import re
 from src.adapters.app_config import AppConfig
 from src.infrastructure.whatsapp_client import WhatsAppClient
 from src.domain.message_processor import MessageProcessor
 from src.infrastructure.ingest_service import IngestService
 from src.application.historial_presenter import HistorialPresenter
+from src.domain.meta_parser import MetaParser
 
 class HistorialService:
     "Servicio para gestionar el historial de mensajes de WhatsApp"
@@ -39,13 +39,9 @@ class HistorialService:
                 for msg in reversed(messages):
                     meta = msg.get("meta", "")
                     body = msg.get("body", "")
-                    m = re.match(r"\[(.+?),\s*(.+?)\]\s*(.+?):", meta)
-                    if m:
-                        fecha = m.group(2)
-                        autor = m.group(3)
-                    else:
-                        fecha = ""
-                        autor = ""
+                    meta_info = MetaParser.parse(meta)
+                    fecha = meta_info["fecha"]
+                    autor = meta_info["autor"]
                     tabla_prev.append([fecha, autor, body])
                     logger.debug("Procesando mensaje: %s %s", meta, body[:50])
                     try:
