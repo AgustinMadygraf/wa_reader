@@ -80,8 +80,7 @@ class HistorialService:
                         procesados += 1
                 if self.config.output_mode == "cli":
                     logger.info("Mostrando resultados en CLI...")
-                    presenter.mostrar_tabla_cruda(tabla_prev, self.config.chat_name)
-                    presenter.mostrar_tabla_procesada(tabla, self.config.chat_name)
+                    presenter.mostrar_tabla_autor_cargo(tabla_prev, self.config.chat_name)
                 logger.info(
                     "Historial procesado: %d de %d mensajes revisados.",
                     procesados,

@@ -5,6 +5,21 @@ Path: src/application/historial_presenter.py
 from tabulate import tabulate
 
 class HistorialPresenter:
+    def mostrar_tabla_autor_cargo(self, tabla_prev, chat_name):
+        """Muestra la tabla con columnas: Fecha, Autor, Mensaje (truncado), Cargo"""
+        from src.domain.meta_parser import MetaParser
+        filas = []
+        for fecha, autor, mensaje in tabla_prev:
+            cargo = MetaParser.get_cargo(autor)
+            mensaje_trunc = self.truncar_mensaje(mensaje, 40)
+            filas.append([fecha, autor, mensaje_trunc, cargo])
+        print(f"\nHistorial del chat: {chat_name}\n")
+        print(tabulate(
+            filas,
+            headers=["Fecha", "Autor", "Mensaje", "Cargo"],
+            tablefmt="github",
+            showindex=False
+        ))
     "Presenta el historial de mensajes en CLI"
     @staticmethod
     def truncar_mensaje(mensaje: str, max_len: int = 40) -> str:
