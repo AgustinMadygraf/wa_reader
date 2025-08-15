@@ -41,8 +41,7 @@ if __name__ == "__main__":
             ).revisar()
         else:
             monitor = WhatsAppMonitor(config,
-                                      processor=MessageProcessor(config,
-                                                                         parser_strategy=estrategia))
+                processor=MessageProcessor(config, parser_strategy=estrategia))
             monitor.run()
     except KeyboardInterrupt:
         print("\nAplicación detenida por el usuario")

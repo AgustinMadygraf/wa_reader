@@ -8,16 +8,22 @@ from src.domain.meta_parser import MetaParser
 class HistorialPresenter:
     "Presenta el historial de mensajes en CLI"
     def mostrar_tabla_autor_cargo(self, tabla_prev, chat_name):
-        "Muestra la tabla con columnas: Fecha, Autor, Mensaje (truncado), Cargo"
+        "Muestra la tabla con columnas: Fecha, Autor, Mensaje (truncado), Cargo, Obs"
         filas = []
-        for fecha, autor, mensaje in tabla_prev:
+        for fila in tabla_prev:
+            # Permitir que tabla_prev tenga 3 o 4 elementos (fecha, autor, mensaje, obs)
+            if len(fila) == 4:
+                fecha, autor, mensaje, obs = fila
+            else:
+                fecha, autor, mensaje = fila
+                obs = ""
             cargo = MetaParser.get_cargo(autor)
             mensaje_trunc = self.truncar_mensaje(mensaje, 40)
-            filas.append([fecha, autor, mensaje_trunc, cargo])
+            filas.append([fecha, autor, mensaje_trunc, cargo, obs])
         print(f"\nHistorial del chat: {chat_name}\n")
         print(tabulate(
             filas,
-            headers=["Fecha", "Autor", "Mensaje", "Cargo"],
+            headers=["Fecha", "Autor", "Mensaje", "Cargo", "Obs"],
             tablefmt="github",
             showindex=False
         ))

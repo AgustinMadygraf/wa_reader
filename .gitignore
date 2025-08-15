@@ -1,3 +1,4 @@
 wa_profile/
 __pycache__
 todo.md
+src/adapters/author_roles.json

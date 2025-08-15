@@ -1,5 +1,5 @@
 """
-Path: src/Adapters/AppConfig.py
+Path: src/adapters/app_config.py
 """
 
 from dateutil import tz
@@ -15,3 +15,4 @@ class AppConfig:
         self.tz_local = tz.gettz("America/Argentina/Buenos_Aires")
         self.chat_archived = False
         self.output_mode = "cli"
+        self.author_roles_path = "./src/adapters/author_roles.json"

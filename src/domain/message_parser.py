@@ -100,14 +100,13 @@ class MessageParser(IMessageParser):
         # Detectar tarea finalizada
         if self.p_tarea_finalizada.search(t):
             observaciones.append("Tarea Finalizada")
-        # Detectar tarea pendiente
-        elif self.p_tarea_pendiente.search(t):
+        # Detectar tarea pendiente (permite ambas en el mismo mensaje)
+        if self.p_tarea_pendiente.search(t):
             observaciones.append("Tarea Pendiente")
         # Si no se detecta ninguna categoría relevante, asigna 'Sin clasificar'
         tiene_maquina = bool(self.p_maq.search(t))
         tiene_formato = bool(self.p_formato.search(t))
         tiene_cantidad = bool(self.p_cant_ctx.search(t))
-        if not (tiene_maquina or tiene_formato or tiene_cantidad):
-            if not observaciones:
-                observaciones.append("Sin clasificar")
+        if not (tiene_maquina or tiene_formato or tiene_cantidad) and not observaciones:
+            observaciones.append("Sin clasificar")
         return observaciones

@@ -2,24 +2,29 @@
 Path: src/domain/meta_parser.py
 """
 import re
+import json
+from src.adapters.app_config import AppConfig
 
 class MetaParser:
     "Parser para extraer información del campo meta de mensajes de WhatsApp"
-    AUTHOR_ROLES = {
-        "Mariano Montenegro Madygraf": "Operario",
-        "Maria De Los Angeles Madygraf": "Operaria",
-        "🌸Eri 2": "Operaria",
-        "Cele Mady 2": "Operaria",
-        "PolloArriondo RRD": "Operario",
-        "Nico Malo Mady": "Coordinador",
-        "Loco Medina Mady": "Operario",
-        "Emiliana Madygraf": "Operaria",
-    }
+    _author_roles = None
+
+    @classmethod
+    def _load_author_roles(cls):
+        if cls._author_roles is None:
+            try:
+                config = AppConfig()
+                with open(config.author_roles_path, encoding="utf-8") as f:
+                    cls._author_roles = json.load(f)
+            except (OSError, json.JSONDecodeError):
+                cls._author_roles = {}
+        return cls._author_roles
 
     @classmethod
     def get_cargo(cls, autor: str) -> str:
         "Devuelve el cargo del autor, o 'Sin definir' si no está en el diccionario."
-        return cls.AUTHOR_ROLES.get(autor, "Sin definir")
+        roles = cls._load_author_roles()
+        return roles.get(autor, "Sin definir")
 
     META_REGEX = re.compile(r"\[(.+?),\s*(.+?)\]\s*(.+?):")
 

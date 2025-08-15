@@ -137,19 +137,24 @@ class WhatsAppClient:
         "Abre un chat en WhatsApp, buscando en la lista principal y en archivados si es necesario."
         self.logger.info("Buscando y abriendo chat: %s", chat_name)
         try:
-            self.page.get_by_role("textbox", name=re.compile("Buscar|Search", re.I)).click()
+            # Buscar el textbox y limpiar antes de escribir
+            textbox = self.page.get_by_role("textbox", name=re.compile("Buscar|Search", re.I))
+            textbox.click()
+            textbox.fill("")  # Limpiar campo
+            textbox.type(chat_name, delay=50)
+            self.page.wait_for_timeout(1000)  # Esperar resultados
         except Error:
-            self.logger.warning(
-                "No se pudo hacer click en el textbox de búsqueda, "
-                "intentando continuar..."
-            )
+            self.logger.warning("No se pudo interactuar con el textbox de búsqueda, intentando continuar...")
+
+        # Buscar el chat por nombre exacto
         chat_locator = self.page.locator(f"//span[@title='{chat_name}']")
         if chat_locator.count() > 0:
             chat_locator.first.click()
             self.logger.info("Leyendo chat: %s", chat_name)
             return
-        # Si no se encuentra, buscar en archivados solo si chat_archived=True
+
         self.logger.info("Chat '%s' no encontrado en la lista principal.", chat_name)
+        # Buscar en archivados si corresponde
         if getattr(self.config, "chat_archived", False):
             self.logger.info("Buscando en archivados...")
             archived_locator = self.page.locator(
@@ -158,6 +163,15 @@ class WhatsAppClient:
                 archived_locator.first.click()
                 self.logger.info("Sección de archivados abierta.")
                 self.page.wait_for_timeout(1000)
+                # Repetir búsqueda en archivados
+                try:
+                    textbox = self.page.get_by_role("textbox", name=re.compile("Buscar|Search", re.I))
+                    textbox.click()
+                    textbox.fill("")
+                    textbox.type(chat_name, delay=50)
+                    self.page.wait_for_timeout(1000)
+                except Error:
+                    self.logger.warning("No se pudo usar el textbox en archivados.")
                 archived_chat_locator = self.page.locator(f"//span[@title='{chat_name}']")
                 if archived_chat_locator.count() > 0:
                     archived_chat_locator.first.click()
@@ -169,6 +183,10 @@ class WhatsAppClient:
                 self.logger.error("No se encontró la sección de archivados en WhatsApp Web.")
         else:
             self.logger.info("No se buscará en archivados porque chat_archived=False.")
+
+        # Si llega aquí, no se encontró el chat
+        self.logger.error("No se pudo encontrar el chat '%s'. Deteniendo ejecución.", chat_name)
+        raise RuntimeError(f"No se pudo encontrar el chat '{chat_name}' en WhatsApp Web.")
 
     def get_messages(self) -> list[dict]:
         "Obtiene los mensajes del chat."
