@@ -52,6 +52,7 @@ class HistorialPresenter:
         print("|" + "|".join(["-" * (a + 2) for a in [ANCHO_FECHA, ANCHO_AUTOR, ANCHO_MENSAJE]]) + "|")
         for fila in filas:
             print("| " + " | ".join(fila) + " |")
+        print("\n")
 
     @staticmethod
     def truncar_mensaje(mensaje: str, max_len: int = 40) -> str:
