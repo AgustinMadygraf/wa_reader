@@ -4,7 +4,7 @@ Path: src/entities/message_parser.py
 
 import re
 import logging
-from src_old.shared.logging_config import setup_logging
+from src.shared.logging_config import setup_logging
 from src_old.domain.interfaces import IMessageParser
 
 setup_logging(debug=True)
