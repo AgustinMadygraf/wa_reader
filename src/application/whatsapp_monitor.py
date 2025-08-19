@@ -4,10 +4,12 @@ Path:
 import time
 import logging
 from datetime import datetime
+
 from src.shared.app_config import AppConfig
-from src.uses_cases.message_processor import MessageProcessor
+
 from src.entities.ingest_service_interface import IIngestService
 from src.entities.whatsapp_client_interface import IWhatsAppClient
+from src.uses_cases.message_processor import MessageProcessor
 
 class WhatsAppMonitor:
     "Monitor de WhatsApp"

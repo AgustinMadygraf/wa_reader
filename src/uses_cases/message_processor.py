@@ -3,6 +3,7 @@ Path: src/uses_cases/message_processor.py
 """
 
 import hashlib
+
 from src.entities.message_parser import MessageParser
 from src.entities.interfaces import IMessageProcessor
 

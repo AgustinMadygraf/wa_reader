@@ -43,7 +43,7 @@ class HistorialPresenter:
             mensaje = ajustar(mensaje, ANCHO_MENSAJE)
             filas.append([fecha, autor, mensaje])
         headers = ["Fecha", "Autor", "Mensaje"]
-        print(f"\nHistorial del chat: {chat_name}\n")
+    print(f"\nTabla datos crudos: {chat_name}\n")
         print("| " + " | ".join([ajustar(h, a) for h, a in zip(headers, [ANCHO_FECHA, ANCHO_AUTOR, ANCHO_MENSAJE])]) + " |")
         print("|" + "|".join(["-" * (a + 2) for a in [ANCHO_FECHA, ANCHO_AUTOR, ANCHO_MENSAJE]]) + "|")
         for fila in filas:

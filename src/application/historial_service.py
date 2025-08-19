@@ -3,7 +3,9 @@ Path: src/application/historial_service.py
 """
 
 import logging
+
 from src.shared.app_config import AppConfig
+
 from src.entities.meta_parser import MetaParser
 from src.uses_cases.message_processor import MessageProcessor
 from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient

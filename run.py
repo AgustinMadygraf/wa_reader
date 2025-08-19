@@ -6,18 +6,17 @@ import argparse
 from datetime import datetime
 
 from src.shared.logging_config import setup_logging
-from src.interface_adapters.gateways.ingest_service import IngestService
-from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
-from src.application.historial_service import HistorialService
 from src.shared.app_config import AppConfig
+
 from src.entities.message_parser import MessageParser
 from src.entities.strategies import ObservacionTareaStrategy
-from src.uses_cases.message_processor import MessageProcessor
 from src.entities.meta_parser import MetaParser
-from src.interface_adapters.presenters.historial_presenter import HistorialPresenter
-
+from src.uses_cases.message_processor import MessageProcessor
+from src.application.historial_service import HistorialService
 from src.application.whatsapp_monitor import WhatsAppMonitor
-
+from src.interface_adapters.gateways.ingest_service import IngestService
+from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
+from src.interface_adapters.presenters.historial_presenter import HistorialPresenter
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor y revisión de historial de WhatsApp")

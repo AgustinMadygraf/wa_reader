@@ -3,6 +3,7 @@ Path: src/entities/message_parser.py
 """
 
 import re
+
 from src.entities.interfaces import IMessageParser
 
 class MessageParser(IMessageParser):
