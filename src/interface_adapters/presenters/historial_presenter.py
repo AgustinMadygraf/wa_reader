@@ -15,7 +15,11 @@ class HistorialPresenter:
         ANCHO_FECHA = 12
         ANCHO_AUTOR = 30
         ANCHO_MENSAJE = 40
-        from wcwidth import wcswidth
+        try:
+            from wcwidth import wcswidth
+        except ImportError:
+            def wcswidth(text):
+                return len(text)
         def ajustar(texto, ancho):
             texto = str(texto) if texto is not None else ""
             texto = texto.replace('\n', ' | ')
@@ -43,7 +47,7 @@ class HistorialPresenter:
             mensaje = ajustar(mensaje, ANCHO_MENSAJE)
             filas.append([fecha, autor, mensaje])
         headers = ["Fecha", "Autor", "Mensaje"]
-    print(f"\nTabla datos crudos: {chat_name}\n")
+        print(f"\nTabla datos crudos: {chat_name}\n")
         print("| " + " | ".join([ajustar(h, a) for h, a in zip(headers, [ANCHO_FECHA, ANCHO_AUTOR, ANCHO_MENSAJE])]) + " |")
         print("|" + "|".join(["-" * (a + 2) for a in [ANCHO_FECHA, ANCHO_AUTOR, ANCHO_MENSAJE]]) + "|")
         for fila in filas:
