@@ -11,7 +11,7 @@ from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
 from src_old.application.historial_service import HistorialService
 from src.shared.app_config import AppConfig
 from src.entities.message_parser import MessageParser
-from src_old.domain.strategies import ObservacionTareaStrategy
+from src.entities.strategies import ObservacionTareaStrategy
 from src.uses_cases.message_processor import MessageProcessor
 from datetime import datetime
 

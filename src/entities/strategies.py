@@ -1,5 +1,5 @@
 """
-Estrategias para análisis de mensajes (patrón Strategy)
+Path: src/domain/strategies.py
 """
 from src.entities.interfaces import IMessageParser
 

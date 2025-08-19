@@ -11,7 +11,7 @@ from datetime import datetime
 from src.entities.ingest_service_interface import IIngestService
 from src.entities.whatsapp_client_interface import IWhatsAppClient
 import json
-from src_old.domain.meta_parser import MetaParser
+from src.entities.meta_parser import MetaParser
 
 
 

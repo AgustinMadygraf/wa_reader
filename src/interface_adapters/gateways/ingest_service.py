@@ -2,8 +2,8 @@
 Path: src/interface_adapters/gateways/ingest_service.py
 """
 
-from src.entities.ingest_service_interface import IIngestService
 import requests
+from src.entities.ingest_service_interface import IIngestService
 
 class IngestService(IIngestService):
     "Servicio de Ingesta"

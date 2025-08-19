@@ -1,6 +1,7 @@
 """
 Path: src/entities/ingest_service_interface.py
 """
+# pylint: disable=unnecessary-pass
 
 from abc import ABC, abstractmethod
 

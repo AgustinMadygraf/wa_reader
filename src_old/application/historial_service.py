@@ -4,14 +4,13 @@ Path: src_old/application/historial_service.py
 
 import logging
 import json
-from src.shared.app_config import AppConfig
-from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
-from src.uses_cases.message_processor import MessageProcessor
 from datetime import datetime
+from src.shared.app_config import AppConfig
+from src.entities.meta_parser import MetaParser
+from src.uses_cases.message_processor import MessageProcessor
+from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
 from src.interface_adapters.gateways.ingest_service import IngestService
-from src_old.application.historial_presenter import HistorialPresenter
-from src_old.domain.meta_parser import MetaParser
-
+from src.interface_adapters.presenters.historial_presenter import HistorialPresenter
 
 class HistorialService:
     "Servicio para gestionar el historial de mensajes de WhatsApp"
