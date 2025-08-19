@@ -24,12 +24,12 @@ class HistorialService:
 
     def revisar(self):
         "Revisa el historial de mensajes de WhatsApp y muestra por CLI o envía por API"
-        self.logger.info("Inicializando cliente de WhatsApp...")
+        self.logger.debug("Inicializando cliente de WhatsApp...")
         with self.wa_client as wa_client:
             wa_client.initialize()
-            self.logger.info("Abriendo chat: %s", self.config.chat_name)
+            self.logger.debug("Abriendo chat: %s", self.config.chat_name)
             wa_client.open_chat(self.config.chat_name)
-            self.logger.info("Extrayendo historial de mensajes...")
+            self.logger.debug("Extrayendo historial de mensajes...")
             messages = wa_client.get_messages()
             self.logger.debug("Total mensajes obtenidos: %d", len(messages))
             procesados = 0

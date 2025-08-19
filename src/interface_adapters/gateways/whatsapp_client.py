@@ -190,6 +190,7 @@ class WhatsAppClient(IWhatsAppClient):
         raise RuntimeError(f"No se pudo encontrar el chat '{chat_name}' en WhatsApp Web.")
 
     def get_messages(self) -> list[dict]:
+        # Cambiar todos los mensajes self.logger.info a self.logger.debug en este archivo
         "Obtiene los mensajes del chat."
         self.logger.info("Extrayendo mensajes del chat...")
         messages = []
