@@ -6,6 +6,7 @@ import logging
 from src.shared.app_config import AppConfig
 from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
 from src_old.domain.message_processor import MessageProcessor
+from datetime import datetime
 from src.interface_adapters.gateways.ingest_service import IngestService
 from src_old.application.historial_presenter import HistorialPresenter
 from src_old.domain.meta_parser import MetaParser
@@ -17,8 +18,10 @@ class HistorialService:
         self.config = config
         self.logger = logging.getLogger("wa_reader.historial")
         self.ingest_service = IngestService(config.ingest_url)
+        def get_fecha():
+            return datetime.now(config.tz_local).strftime("%Y-%m-%d")
         if processor is None:
-            self.processor = MessageProcessor(config)
+            self.processor = MessageProcessor(get_fecha)
         else:
             self.processor = processor
 
@@ -26,7 +29,9 @@ class HistorialService:
         "Revisa el historial de mensajes de WhatsApp y muestra por CLI o envía por API"
         logger = logging.getLogger("wa_reader.historial")
         ingest_service = IngestService(self.config.ingest_url)
-        processor = MessageProcessor(self.config)
+        def get_fecha():
+            return datetime.now(self.config.tz_local).strftime("%Y-%m-%d")
+        processor = MessageProcessor(get_fecha)
         presenter = HistorialPresenter()
         try:
             with WhatsAppClient(self.config) as wa_client:

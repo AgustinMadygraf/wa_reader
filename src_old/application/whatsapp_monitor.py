@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 import requests
 from src.shared.app_config import AppConfig
 from src_old.domain.message_processor import MessageProcessor
+from datetime import datetime
 from src_old.domain.ingest_service_interface import IIngestService
 from src_old.domain.whatsapp_client_interface import IWhatsAppClient
 from src_old.domain.meta_parser import MetaParser
@@ -19,8 +20,10 @@ class WhatsAppMonitor:
         self.config = config
         self.ingest_service = ingest_service
         self.wa_client = wa_client
+        def get_fecha():
+            return datetime.now(config.tz_local).strftime("%Y-%m-%d")
         if processor is None:
-            self.processor = MessageProcessor(config)
+            self.processor = MessageProcessor(get_fecha)
         else:
             self.processor = processor
         self.logger = logging.getLogger("wa_reader.monitor")

@@ -4,14 +4,15 @@ Path: src/domain/message_processor.py
 
 import hashlib
 from datetime import datetime
-from src_old.domain.message_parser import MessageParser
+from src.entities.message_parser import MessageParser
 from src_old.domain.interfaces import IMessageProcessor
 
 
 class MessageProcessor(IMessageProcessor):
     "Procesador de mensajes de WhatsApp con soporte para estrategias"
-    def __init__(self, config, parser_strategy=None):
-        self.config = config
+    def __init__(self, get_fecha_fn, parser_strategy=None):
+        "get_fecha_fn: función que retorna la fecha actual en formato string."
+        self.get_fecha_fn = get_fecha_fn
         # Permite inyectar una estrategia de análisis, por defecto usa MessageParser
         if parser_strategy is None:
             self.parser = MessageParser()
@@ -29,7 +30,7 @@ class MessageProcessor(IMessageProcessor):
         if not parsed:
             return None
         return {
-            "fecha": datetime.now(self.config.tz_local).strftime("%Y-%m-%d"),
+            "fecha": self.get_fecha_fn(),
             "maquina": parsed.get("maquina", ""),
             "formato": parsed.get("formato", ""),
             "cantidad": parsed.get("cantidad", 0),

@@ -10,9 +10,10 @@ from src.interface_adapters.gateways.ingest_service import IngestService
 from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
 from src_old.application.historial_service import HistorialService
 from src.shared.app_config import AppConfig
-from src_old.domain.message_parser import MessageParser
+from src.entities.message_parser import MessageParser
 from src_old.domain.strategies import ObservacionTareaStrategy
 from src_old.domain.message_processor import MessageProcessor
+from datetime import datetime
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor y revisión de historial de WhatsApp")
@@ -32,12 +33,15 @@ if __name__ == "__main__":
     base_parser = MessageParser()
     estrategia = ObservacionTareaStrategy(base_parser)
 
+    def get_fecha():
+        return datetime.now(config.tz_local).strftime("%Y-%m-%d")
+
     try:
         if args.historial:
             HistorialService(
                 config,
                 processor=MessageProcessor(
-                    config,
+                    get_fecha,
                     parser_strategy=estrategia
                 )
             ).revisar()
@@ -52,7 +56,7 @@ if __name__ == "__main__":
                 config,
                 ingest_service=ingest_service,
                 wa_client=wa_client,
-                processor=MessageProcessor(config, parser_strategy=estrategia)
+                processor=MessageProcessor(get_fecha, parser_strategy=estrategia)
             )
             monitor.run()
     except KeyboardInterrupt:

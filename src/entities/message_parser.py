@@ -3,12 +3,7 @@ Path: src/entities/message_parser.py
 """
 
 import re
-import logging
-from src.shared.logging_config import setup_logging
 from src_old.domain.interfaces import IMessageParser
-
-setup_logging(debug=True)
-logger = logging.getLogger("wa_reader.message_parser")
 
 class MessageParser(IMessageParser):
     "Parser de mensajes de WhatsApp"
@@ -68,12 +63,8 @@ class MessageParser(IMessageParser):
         out = {}
         if m := self.p_maq.search(t):
             out["maquina"] = m.group(1).lower()
-        else:
-            logger.debug("No se detectó máquina en: %s", t)
         if m := self.p_formato.search(t):
             out["formato"] = m.group(1)
-        else:
-            logger.debug("No se detectó formato en: %s", t)
         if m := self.p_turno.search(t):
             out["turno"] = m.group(1).lower()
         if m := self.p_personas.search(t):
@@ -87,8 +78,6 @@ class MessageParser(IMessageParser):
         cantidades = [self.norm_int(x) for x in self.p_cant_ctx.findall(t)]
         if cantidades:
             out["cantidad"] = max(cantidades)
-        else:
-            logger.debug("No se detectó cantidad en: %s", t)
 
         return out if any(out) else {}
 
