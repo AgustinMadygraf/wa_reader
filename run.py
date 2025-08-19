@@ -26,7 +26,11 @@ if __name__ == "__main__":
     parser.add_argument("--debug", action="store_true", help="Habilita logging DEBUG")
     parser.add_argument("--output-mode", choices=["cli", "api"],
                         default="cli", help="Modo de salida")
+    import sys
     args = parser.parse_args()
+    # Si no se pasa ningún argumento, usar --historial por defecto
+    if len(sys.argv) == 1:
+        args.historial = True
 
     setup_logging(debug=args.debug)
 

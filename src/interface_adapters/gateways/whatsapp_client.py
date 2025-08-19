@@ -50,7 +50,7 @@ class WhatsAppClient(IWhatsAppClient):
 
     def initialize(self, login_timeout: int = 120, retry_count: int = 2):
         "Inicializa el cliente de WhatsApp. login_timeout en segundos."
-        self.logger.info("Navegando a WhatsApp Web...")
+        self.logger.debug("Navegando a WhatsApp Web...")
 
         for attempt in range(1, retry_count + 1):
             try:
