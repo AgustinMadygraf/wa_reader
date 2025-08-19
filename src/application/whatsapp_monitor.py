@@ -5,7 +5,7 @@ import time
 import logging
 from urllib.parse import urlencode
 import requests
-from src.adapters.app_config import AppConfig
+from src.shared.app_config import AppConfig
 from src.entities.message_processor import MessageProcessor
 from src.entities.ingest_service_interface import IIngestService
 from src.entities.whatsapp_client_interface import IWhatsAppClient

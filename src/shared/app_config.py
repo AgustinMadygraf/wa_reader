@@ -15,4 +15,4 @@ class AppConfig:
         self.tz_local = tz.gettz("America/Argentina/Buenos_Aires")
         self.chat_archived = False
         self.output_mode = "cli"
-        self.author_roles_path = "./src/adapters/author_roles.json"
+        self.author_roles_path = "./src/shared/author_roles.json"
