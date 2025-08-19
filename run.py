@@ -16,7 +16,7 @@ from src.uses_cases.message_processor import MessageProcessor
 from src.entities.meta_parser import MetaParser
 from src.interface_adapters.presenters.historial_presenter import HistorialPresenter
 
-from src_old.application.whatsapp_monitor import WhatsAppMonitor
+from src.application.whatsapp_monitor import WhatsAppMonitor
 
 
 if __name__ == "__main__":
@@ -75,12 +75,22 @@ if __name__ == "__main__":
                 headless=config.headless,
                 chat_archived=getattr(config, 'chat_archived', False)
             )
+            # Cargar roles de autor desde archivo
+            import json
+            try:
+                with open(config.author_roles_path, encoding="utf-8") as f:
+                    author_roles = json.load(f)
+            except (OSError, json.JSONDecodeError):
+                author_roles = {}
+
+            meta_parser = MetaParser(author_roles)
             monitor = WhatsAppMonitor(
                 config,
                 ingest_service=ingest_service,
                 wa_client=wa_client,
                 processor=MessageProcessor(get_fecha, parser_strategy=estrategia)
             )
+            monitor.meta_parser = meta_parser  # <--- Asignar MetaParser aquí
             monitor.run()
     except KeyboardInterrupt:
         print("\nAplicación detenida por el usuario")

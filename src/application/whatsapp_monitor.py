@@ -1,22 +1,15 @@
 """
-Path: src_old/application/whatsapp_monitor.py
+Path: 
 """
 import time
 import logging
-from urllib.parse import urlencode
-import requests
+from datetime import datetime
 from src.shared.app_config import AppConfig
 from src.uses_cases.message_processor import MessageProcessor
-from datetime import datetime
 from src.entities.ingest_service_interface import IIngestService
 from src.entities.whatsapp_client_interface import IWhatsAppClient
-import json
-from src.entities.meta_parser import MetaParser
-
-
 
 class WhatsAppMonitor:
-
     "Monitor de WhatsApp"
     def __init__(self, config: AppConfig, ingest_service: IIngestService, wa_client: IWhatsAppClient, processor=None):
         self.config = config
@@ -29,18 +22,15 @@ class WhatsAppMonitor:
         else:
             self.processor = processor
         self.logger = logging.getLogger("wa_reader.monitor")
-
-        # Cargar roles de autor desde archivo y crear MetaParser
-        try:
-            with open(self.config.author_roles_path, encoding="utf-8") as f:
-                author_roles = json.load(f)
-        except (OSError, json.JSONDecodeError):
-            author_roles = {}
-        self.meta_parser = MetaParser(author_roles)
+        # MetaParser debe ser inyectado o configurado externamente
+        self.meta_parser = None  # Se recomienda inyectar desde la capa de configuración
 
     def run(self):
-        "Ejecuta el monitor de WhatsApp."
+        "Ejecuta el monitor de WhatsApp. Solo orquesta, delega envío y presentación."
         self.logger.info("Iniciando monitor de WhatsApp...")
+        if self.meta_parser is None:
+            self.logger.error("MetaParser no configurado. Abortando.")
+            return
         try:
             with self.wa_client as wa_client:
                 self.logger.info("Inicializando cliente de WhatsApp...")
@@ -64,13 +54,11 @@ class WhatsAppMonitor:
                             self.logger.error("Error procesando mensaje: %s", e)
                             continue
                         if payload:
-                            try:
-                                status = self.ingest_service.send(payload)
-                                estado = status if status is not None else "ERROR_RED"
-                                url = f"{self.config.ingest_url}?{urlencode(payload)}"
-                                self.logger.info("→ GET %s  [%s]", url, estado)
-                            except requests.RequestException as e:
-                                self.logger.error("Error enviando payload: %s", e)
+                            # Delegar envío a IngestService (gateway)
+                            status = self.ingest_service.send(payload)
+                            estado = status if status is not None else "ERROR_RED"
+                            # Delegar presentación/logging a Presenter externo
+                            # Ejemplo: presenter.mostrar_envio(payload, estado)
                     time.sleep(self.config.poll_sec)
         except KeyboardInterrupt:
             self.logger.info("Monitor detenido por el usuario.")
