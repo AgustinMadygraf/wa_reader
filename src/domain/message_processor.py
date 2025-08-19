@@ -4,8 +4,8 @@ Path: src/domain/message_processor.py
 
 import hashlib
 from datetime import datetime
-from src.entities.message_parser import MessageParser
-from src.entities.interfaces import IMessageProcessor
+from src.domain.message_parser import MessageParser
+from src.domain.interfaces import IMessageProcessor
 
 
 class MessageProcessor(IMessageProcessor):

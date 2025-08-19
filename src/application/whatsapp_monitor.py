@@ -6,10 +6,10 @@ import logging
 from urllib.parse import urlencode
 import requests
 from src.shared.app_config import AppConfig
-from src.entities.message_processor import MessageProcessor
-from src.entities.ingest_service_interface import IIngestService
-from src.entities.whatsapp_client_interface import IWhatsAppClient
-from src.entities.meta_parser import MetaParser
+from src.domain.message_processor import MessageProcessor
+from src.domain.ingest_service_interface import IIngestService
+from src.domain.whatsapp_client_interface import IWhatsAppClient
+from src.domain.meta_parser import MetaParser
 
 
 

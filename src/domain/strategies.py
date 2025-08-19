@@ -1,7 +1,7 @@
 """
 Estrategias para análisis de mensajes (patrón Strategy)
 """
-from src.entities.interfaces import IMessageParser
+from src.domain.interfaces import IMessageParser
 
 class ClasificacionBasicaStrategy(IMessageParser):
     "Estrategia básica: solo detecta máquina, formato, cantidad, personas, turno y observaciones."

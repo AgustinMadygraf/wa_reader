@@ -2,7 +2,7 @@
 Pruebas unitarias para MessageParser: clasificación de observaciones
 """
 import unittest
-from src.entities.message_parser import MessageParser
+from src.domain.message_parser import MessageParser
 
 class TestMessageParserObservaciones(unittest.TestCase):
     "Pruebas para la clasificación de observaciones"

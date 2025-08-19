@@ -10,9 +10,9 @@ from src.infrastructure.ingest_service import IngestService
 from src.infrastructure.whatsapp_client import WhatsAppClient
 from src.application.historial_service import HistorialService
 from src.shared.app_config import AppConfig
-from src.entities.message_parser import MessageParser
-from src.entities.strategies import ObservacionTareaStrategy
-from src.entities.message_processor import MessageProcessor
+from src.domain.message_parser import MessageParser
+from src.domain.strategies import ObservacionTareaStrategy
+from src.domain.message_processor import MessageProcessor
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor y revisión de historial de WhatsApp")
