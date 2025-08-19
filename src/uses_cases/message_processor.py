@@ -1,5 +1,5 @@
 """
-Path: src/domain/message_processor.py
+Path: src/uses_cases/message_processor.py
 """
 
 import hashlib
