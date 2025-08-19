@@ -3,7 +3,7 @@ Path: src/domain/meta_parser.py
 """
 import re
 import json
-from src.shared.app_config import AppConfig
+from src_old.shared.app_config import AppConfig
 
 class MetaParser:
     "Parser para extraer información del campo meta de mensajes de WhatsApp"

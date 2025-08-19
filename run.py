@@ -3,16 +3,16 @@ Path: run.py
 """
 
 import argparse
-from src.shared.logging_config import setup_logging
+from src_old.shared.logging_config import setup_logging
 
-from src.application.whatsapp_monitor import WhatsAppMonitor
-from src.infrastructure.ingest_service import IngestService
-from src.infrastructure.whatsapp_client import WhatsAppClient
-from src.application.historial_service import HistorialService
-from src.shared.app_config import AppConfig
-from src.domain.message_parser import MessageParser
-from src.domain.strategies import ObservacionTareaStrategy
-from src.domain.message_processor import MessageProcessor
+from src_old.application.whatsapp_monitor import WhatsAppMonitor
+from src_old.infrastructure.ingest_service import IngestService
+from src_old.infrastructure.whatsapp_client import WhatsAppClient
+from src_old.application.historial_service import HistorialService
+from src_old.shared.app_config import AppConfig
+from src_old.domain.message_parser import MessageParser
+from src_old.domain.strategies import ObservacionTareaStrategy
+from src_old.domain.message_processor import MessageProcessor
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor y revisión de historial de WhatsApp")

@@ -5,7 +5,7 @@ Path: src/Infrastructure/WhatsAppClient.py
 
 import re
 import logging
-from src.shared.app_config import AppConfig
+from src_old.shared.app_config import AppConfig
 from playwright.sync_api import sync_playwright  # noqa: E402
 from playwright.sync_api import Error  # noqa: E402
 
