@@ -6,11 +6,13 @@ import argparse
 from src.common.logging_config import setup_logging
 
 from src.application.whatsapp_monitor import WhatsAppMonitor
+from src.infrastructure.ingest_service import IngestService
+from src.infrastructure.whatsapp_client import WhatsAppClient
 from src.application.historial_service import HistorialService
 from src.adapters.app_config import AppConfig
-from src.domain.message_parser import MessageParser
-from src.domain.strategies import ObservacionTareaStrategy
-from src.domain.message_processor import MessageProcessor
+from src.entities.message_parser import MessageParser
+from src.entities.strategies import ObservacionTareaStrategy
+from src.entities.message_processor import MessageProcessor
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor y revisión de historial de WhatsApp")
@@ -40,8 +42,14 @@ if __name__ == "__main__":
                 )
             ).revisar()
         else:
-            monitor = WhatsAppMonitor(config,
-                processor=MessageProcessor(config, parser_strategy=estrategia))
+            ingest_service = IngestService(config.ingest_url)
+            wa_client = WhatsAppClient(config)
+            monitor = WhatsAppMonitor(
+                config,
+                ingest_service=ingest_service,
+                wa_client=wa_client,
+                processor=MessageProcessor(config, parser_strategy=estrategia)
+            )
             monitor.run()
     except KeyboardInterrupt:
         print("\nAplicación detenida por el usuario")

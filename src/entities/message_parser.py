@@ -5,7 +5,7 @@ Path: src/domain/message_parser.py
 import re
 import logging
 from src.common.logging_config import setup_logging
-from src.domain.interfaces import IMessageParser
+from src.entities.interfaces import IMessageParser
 
 setup_logging(debug=True)
 logger = logging.getLogger("wa_reader.message_parser")

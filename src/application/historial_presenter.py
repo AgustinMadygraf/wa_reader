@@ -3,7 +3,7 @@ Path: src/application/historial_presenter.py
 """
 
 from tabulate import tabulate
-from src.domain.meta_parser import MetaParser
+from src.entities.meta_parser import MetaParser
 
 class HistorialPresenter:
     "Presenta el historial de mensajes en CLI"

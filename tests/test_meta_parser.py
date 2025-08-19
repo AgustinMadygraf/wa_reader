@@ -2,7 +2,7 @@
 Path: tests/test_meta_parser.py
 """
 import unittest
-from src.domain.meta_parser import MetaParser
+from src.entities.meta_parser import MetaParser
 
 class TestMetaParser(unittest.TestCase):
     "Pruebas para el MetaParser"

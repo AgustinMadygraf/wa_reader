@@ -1,22 +1,24 @@
 """
-Path: src/Application/WhatsAppMonitor.py
+Path: src/application/whatsapp_monitor.py
 """
 import time
 import logging
 from urllib.parse import urlencode
 import requests
 from src.adapters.app_config import AppConfig
-from src.domain.message_processor import MessageProcessor
-from src.infrastructure.ingest_service import IngestService
-from src.infrastructure.whatsapp_client import WhatsAppClient
-from src.domain.meta_parser import MetaParser
+from src.entities.message_processor import MessageProcessor
+from src.entities.ingest_service_interface import IIngestService
+from src.entities.whatsapp_client_interface import IWhatsAppClient
+from src.entities.meta_parser import MetaParser
+
 
 
 class WhatsAppMonitor:
     "Monitor de WhatsApp"
-    def __init__(self, config: AppConfig, processor=None):
+    def __init__(self, config: AppConfig, ingest_service: IIngestService, wa_client: IWhatsAppClient, processor=None):
         self.config = config
-        self.ingest_service = IngestService(config.ingest_url)
+        self.ingest_service = ingest_service
+        self.wa_client = wa_client
         if processor is None:
             self.processor = MessageProcessor(config)
         else:
@@ -27,7 +29,7 @@ class WhatsAppMonitor:
         "Ejecuta el monitor de WhatsApp."
         self.logger.info("Iniciando monitor de WhatsApp...")
         try:
-            with WhatsAppClient(self.config) as wa_client:
+            with self.wa_client as wa_client:
                 self.logger.info("Inicializando cliente de WhatsApp...")
                 wa_client.initialize()
                 self.logger.info("Abriendo chat: %s", self.config.chat_name)
