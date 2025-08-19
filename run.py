@@ -7,7 +7,7 @@ from src.shared.logging_config import setup_logging
 
 from src_old.application.whatsapp_monitor import WhatsAppMonitor
 from src_old.infrastructure.ingest_service import IngestService
-from src_old.infrastructure.whatsapp_client import WhatsAppClient
+from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
 from src_old.application.historial_service import HistorialService
 from src.shared.app_config import AppConfig
 from src_old.domain.message_parser import MessageParser
@@ -43,7 +43,11 @@ if __name__ == "__main__":
             ).revisar()
         else:
             ingest_service = IngestService(config.ingest_url)
-            wa_client = WhatsAppClient(config)
+            wa_client = WhatsAppClient(
+                user_data_dir=config.user_data,
+                headless=config.headless,
+                chat_archived=getattr(config, 'chat_archived', False)
+            )
             monitor = WhatsAppMonitor(
                 config,
                 ingest_service=ingest_service,

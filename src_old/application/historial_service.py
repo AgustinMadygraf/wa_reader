@@ -4,7 +4,7 @@ Path: src/application/historial_service.py
 
 import logging
 from src.shared.app_config import AppConfig
-from src_old.infrastructure.whatsapp_client import WhatsAppClient
+from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
 from src_old.domain.message_processor import MessageProcessor
 from src_old.infrastructure.ingest_service import IngestService
 from src_old.application.historial_presenter import HistorialPresenter

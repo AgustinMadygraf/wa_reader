@@ -5,15 +5,17 @@ Path: src/Infrastructure/WhatsAppClient.py
 
 import re
 import logging
-from src.shared.app_config import AppConfig
+from src_old.domain.whatsapp_client_interface import IWhatsAppClient
 from playwright.sync_api import sync_playwright  # noqa: E402
 from playwright.sync_api import Error  # noqa: E402
 
 
-class WhatsAppClient:
+class WhatsAppClient(IWhatsAppClient):
     "Cliente de WhatsApp"
-    def __init__(self, config: AppConfig):
-        self.config = config
+    def __init__(self, user_data_dir: str, headless: bool = True, chat_archived: bool = False):
+        self.user_data_dir = user_data_dir
+        self.headless = headless
+        self.chat_archived = chat_archived
         self.playwright = None
         self.context = None
         self.page = None
@@ -23,14 +25,14 @@ class WhatsAppClient:
         self.logger.info("Iniciando Playwright y contexto de navegador...")
         self.playwright = sync_playwright().start()
         self.context = self.playwright.chromium.launch_persistent_context(
-            user_data_dir=self.config.user_data,
-            headless=self.config.headless
+            user_data_dir=self.user_data_dir,
+            headless=self.headless
         )
         self.page = self.context.new_page()
         self.logger.debug(
             "Contexto lanzado con user_data_dir=%s, headless=%s",
-            self.config.user_data,
-            self.config.headless
+            self.user_data_dir,
+            self.headless
         )
         return self
 
@@ -155,7 +157,7 @@ class WhatsAppClient:
 
         self.logger.info("Chat '%s' no encontrado en la lista principal.", chat_name)
         # Buscar en archivados si corresponde
-        if getattr(self.config, "chat_archived", False):
+        if self.chat_archived:
             self.logger.info("Buscando en archivados...")
             archived_locator = self.page.locator(
                 "//span[contains(text(), 'Archivados') or contains(text(), 'Archived')]")
