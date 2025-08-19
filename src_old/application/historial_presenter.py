@@ -1,12 +1,16 @@
 """
-Path: src/application/historial_presenter.py
+Path: src_old/application/historial_presenter.py
 """
 
 from tabulate import tabulate
 from src_old.domain.meta_parser import MetaParser
 
+
 class HistorialPresenter:
     "Presenta el historial de mensajes en CLI"
+    def __init__(self, meta_parser: MetaParser):
+        self.meta_parser = meta_parser
+
     def mostrar_tabla_autor_cargo(self, tabla_prev, chat_name):
         "Muestra la tabla con columnas: Fecha, Autor, Mensaje (truncado), Cargo, Obs"
         filas = []
@@ -17,7 +21,7 @@ class HistorialPresenter:
             else:
                 fecha, autor, mensaje = fila
                 obs = ""
-            cargo = MetaParser.get_cargo(autor)
+            cargo = self.meta_parser.get_cargo(autor)
             mensaje_trunc = self.truncar_mensaje(mensaje, 40)
             filas.append([fecha, autor, mensaje_trunc, cargo, obs])
         print(f"\nHistorial del chat: {chat_name}\n")

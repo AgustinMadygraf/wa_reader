@@ -1,8 +1,9 @@
 """
-Path: src/application/historial_service.py
+Path: src_old/application/historial_service.py
 """
 
 import logging
+import json
 from src.shared.app_config import AppConfig
 from src.interface_adapters.gateways.whatsapp_client import WhatsAppClient
 from src.uses_cases.message_processor import MessageProcessor
@@ -32,7 +33,17 @@ class HistorialService:
         def get_fecha():
             return datetime.now(self.config.tz_local).strftime("%Y-%m-%d")
         processor = MessageProcessor(get_fecha)
-        presenter = HistorialPresenter()
+
+        # Cargar roles de autor desde archivo
+        try:
+            with open(self.config.author_roles_path, encoding="utf-8") as f:
+                author_roles = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            author_roles = {}
+
+        meta_parser = MetaParser(author_roles)
+        presenter = HistorialPresenter(meta_parser)
+
         try:
             with WhatsAppClient(self.config) as wa_client:
                 logger.info("Inicializando cliente de WhatsApp...")
@@ -48,7 +59,7 @@ class HistorialService:
                 for msg in reversed(messages):
                     meta = msg.get("meta", "")
                     body = msg.get("body", "")
-                    meta_info = MetaParser.parse(meta)
+                    meta_info = meta_parser.parse(meta)
                     fecha = meta_info["fecha"]
                     autor = meta_info["autor"]
                     tabla_prev.append([fecha, autor, body])

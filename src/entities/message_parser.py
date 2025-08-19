@@ -3,7 +3,7 @@ Path: src/entities/message_parser.py
 """
 
 import re
-from src_old.domain.interfaces import IMessageParser
+from src.entities.interfaces import IMessageParser
 
 class MessageParser(IMessageParser):
     "Parser de mensajes de WhatsApp"

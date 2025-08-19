@@ -1,5 +1,5 @@
 """
-Path: src/application/whatsapp_monitor.py
+Path: src_old/application/whatsapp_monitor.py
 """
 import time
 import logging
@@ -8,13 +8,15 @@ import requests
 from src.shared.app_config import AppConfig
 from src.uses_cases.message_processor import MessageProcessor
 from datetime import datetime
-from src_old.domain.ingest_service_interface import IIngestService
-from src_old.domain.whatsapp_client_interface import IWhatsAppClient
+from src.entities.ingest_service_interface import IIngestService
+from src.entities.whatsapp_client_interface import IWhatsAppClient
+import json
 from src_old.domain.meta_parser import MetaParser
 
 
 
 class WhatsAppMonitor:
+
     "Monitor de WhatsApp"
     def __init__(self, config: AppConfig, ingest_service: IIngestService, wa_client: IWhatsAppClient, processor=None):
         self.config = config
@@ -27,6 +29,14 @@ class WhatsAppMonitor:
         else:
             self.processor = processor
         self.logger = logging.getLogger("wa_reader.monitor")
+
+        # Cargar roles de autor desde archivo y crear MetaParser
+        try:
+            with open(self.config.author_roles_path, encoding="utf-8") as f:
+                author_roles = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            author_roles = {}
+        self.meta_parser = MetaParser(author_roles)
 
     def run(self):
         "Ejecuta el monitor de WhatsApp."
@@ -45,7 +55,7 @@ class WhatsAppMonitor:
                     for msg in messages:
                         meta = msg.get("meta", "")
                         _body = msg.get("body", "")
-                        meta_info = MetaParser.parse(meta)
+                        meta_info = self.meta_parser.parse(meta)
                         _fecha = meta_info["fecha"]
                         _autor = meta_info["autor"]
                         try:

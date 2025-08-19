@@ -1,5 +1,5 @@
 """
-Path: src/domain/interfaces.py
+Path: src/entities/interfaces.py
 Interfaces para componentes principales del sistema (parser, procesador, etc.)
 """
 from abc import ABC, abstractmethod

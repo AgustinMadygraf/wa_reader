@@ -2,7 +2,7 @@
 Path: src/interface_adapters/gateways/ingest_service.py
 """
 
-from src_old.domain.ingest_service_interface import IIngestService
+from src.entities.ingest_service_interface import IIngestService
 import requests
 
 class IngestService(IIngestService):
